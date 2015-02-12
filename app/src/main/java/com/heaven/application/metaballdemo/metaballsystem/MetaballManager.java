@@ -14,8 +14,8 @@ public class MetaballManager {
 
     private static float gooieness = 2.0F;
     private static float threshold = 0.0006F;
-    private static float resolution = 10.0F;
-    private static int maxSteps = 400;
+    private static float resolution = 5.0F;
+    private static int maxSteps = 2000;
 
     private List<Metaball> metaballs;
     private Path outline;
@@ -44,6 +44,10 @@ public class MetaballManager {
         minStrength = Math.min(metaball.getStrength(), minStrength);
 
         metaballs.add(metaball);
+    }
+
+    public void removeAll(){
+        metaballs.clear();
     }
 
     public void removeMetaball(Metaball metaball){

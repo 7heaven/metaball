@@ -1,12 +1,16 @@
 package com.heaven.application.metaballdemo;
 
 import android.content.Context;
+import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
+import android.graphics.DashPathEffect;
+import android.graphics.EmbossMaskFilter;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.heaven.application.metaballdemo.metaballsystem.*;
 
@@ -27,6 +31,9 @@ public class MetaballView extends View {
 
     private Paint paint;
 
+    private DashPathEffect pathEffect;
+
+
     public MetaballView(Context context){
         this(context, null);
     }
@@ -40,17 +47,28 @@ public class MetaballView extends View {
 
         metaballManager = MetaballManager.getInstance();
 
-        metaballManager.addMetaball(new Metaball(new Vector2D(500, 300), 4.0F));
-        metaballManager.addMetaball(new Metaball(new Vector2D(100, 150), 4.0F));
 
-        targetBall = new Metaball(new Vector2D(0, 0), 2.0F);
+        int width = context.getResources().getDisplayMetrics().widthPixels;
+        int height = context.getResources().getDisplayMetrics().heightPixels;
+
+        metaballManager.removeAll();
+
+        for(int i = 0; i < 6; i++){
+            metaballManager.addMetaball(new Metaball(new Vector2D((float) (width * Math.random()), (float) (height * Math.random())), (float) (6.0F * Math.random())));
+        }
+
+        targetBall = new Metaball(new Vector2D(0, 0), 4.0F);
 
         metaballManager.addMetaball(targetBall);
 
         paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        paint.setColor(0xFF00CCFF);
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(5);
-        paint.setColor(0xFF00CCFF);
+
+        pathEffect = new DashPathEffect(new float[]{2, 2}, 4);
+        paint.setPathEffect(pathEffect);
+
     }
 
     @Override
