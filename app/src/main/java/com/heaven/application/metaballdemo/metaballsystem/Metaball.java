@@ -2,20 +2,22 @@ package com.heaven.application.metaballdemo.metaballsystem;
 
 import android.graphics.PointF;
 
+import com.heaven.application.metaballdemo.MathUtil;
+
 /**
  * Created by caifangmao on 15/2/11.
  */
 public class Metaball {
 
-    public static final int MIN_STRENGTH = 1;
-    public static final int MAX_STRENGTH = 100;
+    public static final float MIN_STRENGTH = 1F;
+    public static final float MAX_STRENGTH = 100F;
 
     private Vector2D position;
     private float strength;
 
-    private boolean tracked;
-    private Vector2D edge;
-    private Vector2D direction;
+    public boolean tracked;
+    public Vector2D edge;
+    public Vector2D direction;
 
     public Metaball(Vector2D position, float strength){
         this.position = position.clone();
@@ -40,7 +42,16 @@ public class Metaball {
         this.position.copy(position);
     }
 
-    public setStrength(float value){
-        strength = MathUtil.
+    public void setStrength(float value){
+        strength = MathUtil.clamp(value, MIN_STRENGTH, MAX_STRENGTH);
+    }
+
+    public float getStrength(){
+        return strength;
+    }
+
+    @Override
+    public String toString(){
+        return "[object Metaball][position=" + position + "][size=" + strength + "]";
     }
 }

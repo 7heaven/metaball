@@ -41,7 +41,7 @@ public class Vector2D {
     }
 
     public float dist(Vector2D v2){
-        return Math.sqrt(distSq(v2));
+        return (float) Math.sqrt(distSq(v2));
     }
 
     public float distSq(Vector2D v2){
@@ -71,7 +71,7 @@ public class Vector2D {
             return this;
         }
 
-        float len = length;
+        float len = getLength();
         x /= len;
         y /= len;
 
@@ -79,7 +79,7 @@ public class Vector2D {
     }
 
     public Vector2D limit(float max){
-        float len = length;
+        float len = getLength();
         if(len > max){
             x *= (max /= len);
             y *= max;
