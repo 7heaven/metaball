@@ -62,7 +62,7 @@ public class MetaballView extends View {
 
         centerX = width / 2;
         centerY = height / 2;
-        centerX = centerX;
+
     }
 
     @Override
