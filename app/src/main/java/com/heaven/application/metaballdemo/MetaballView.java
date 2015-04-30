@@ -13,7 +13,9 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.heaven.application.metaballdemo.metaballsystem.*;
+import com.heaven.application.metaballdemo.metaballsystem.Metaball;
+import com.heaven.application.metaballdemo.metaballsystem.MetaballManager;
+import com.heaven.application.metaballdemo.metaballsystem.Vector2D;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +39,7 @@ public class MetaballView extends View {
 
     private MetaballManager metaballManager;
 
-    private Metaball[] targetBall = new Metaball[4];
+    private Metaball[] targetBall = new Metaball[1];
     private List<Metaball> subMetaball;
     private List<Point> originPositions;
     private List<PointF> as;
@@ -50,13 +52,13 @@ public class MetaballView extends View {
         public void run(){
             for(int i = 0; i < as.size(); i++){
                 Metaball ball = subMetaball.get(i);
-                Point origin = originPositions.get(i);
-                PointF a = as.get(i);
                 if(!ball.attached){
+                    Point origin = originPositions.get(i);
+                    PointF a = as.get(i);
                     Vector2D v = ball.getPosition();
 
-                    a.x += (v.x - origin.x) * 0.3F;
-                    a.y += (v.y - origin.y) * 0.3F;
+                    a.x += (origin.x - v.x) * 0.1F;
+                    a.y += (origin.y - v.y) * 0.1F;
 
                     v.x += a.x;
                     v.y += a.y;
@@ -65,12 +67,13 @@ public class MetaballView extends View {
 
                     a.x *= 0.81F;
                     a.y *= 0.81F;
-
-                    invalidate();
-
                 }
 
             }
+
+            if(metaballManager != null && metaballManager.getSize() > 0) metaballManager.freeze();
+
+            invalidate();
 
             handler.postDelayed(this, 20);
         }
@@ -171,30 +174,61 @@ public class MetaballView extends View {
 
                 float distance = (float) Math.sqrt(dx * dx + dy * dy);
 
-                for(int i = 1; i < targetBall.length; i++){
-                    Point p = centerRadiusPoint(new Point(centerX, centerY), degree + (i * 0.8F), distance - (i * 30));
+//                for(int i = 1; i < targetBall.length; i++){
+//                    Point p = centerRadiusPoint(new Point(centerX, centerY), degree + (i * 0.8F), distance - (i * 30));
+//
+//                    targetBall[i].setPosition(new Vector2D(p.x, p.y));
+//                }
 
-                    targetBall[i].setPosition(new Vector2D(p.x, p.y));
-                }
-
+                Metaball tBall = null;
+                float dis = Integer.MAX_VALUE;
+                float ddis = 0;
+                float d = 0;
+                float dd = 0;
                 for(int i = 0; i < subMetaball.size(); i++){
                     Metaball m = subMetaball.get(i);
                     Vector2D v = m.getPosition();
+                    Point p = originPositions.get(i);
 
-                    dx = event.getX() - v.x;
-                    dy = event.getY() - v.y;
+                    dx = event.getX() - p.x;
+                    dy = event.getY() - p.y;
 
-                    float d = dx * dx + dy * dy;
+                    d = dx * dx + dy * dy;
 
-                    if(d > 2500){
-                        m.attached = false;
+
+
+                    dx = v.x - p.x;
+                    dy = v.y - p.y;
+
+                    dd = dx * dx + dy * dy;
+
+                    if(d < dis){
+                        dis = d;
+                        tBall = m;
+                        ddis = dd;
+                    }
+
+                    Log.d("d" + d, "ddd");
+
+//                    if(d > 100 && dd > 2500){
+//                        m.attached = false;
+//                    }else{
+//                        m.attached = true;
+//
+//                        v.x = event.getX();
+//                        v.y = event.getY();
+//
+//                        m.setPosition(v);
+//                    }
+                }
+
+                if(tBall != null){
+                    if(dis > 100 && ddis > 2500){
+                        tBall.attached = false;
                     }else{
-                        m.attached = true;
-
-                        v.x = event.getX();
-                        v.y = event.getY();
-
-                        m.setPosition(v);
+                        tBall.attached = true;
+                        tBall.getPosition().x = event.getX();
+                        tBall.getPosition().y = event.getY();
                     }
                 }
 
