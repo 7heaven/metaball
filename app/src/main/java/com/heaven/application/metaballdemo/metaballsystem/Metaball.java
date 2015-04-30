@@ -15,6 +15,7 @@ public class Metaball {
     private Vector2D position;
     private float strength;
 
+    public boolean attached = false;
     public boolean tracked;
     public Vector2D edge;
     public Vector2D direction;

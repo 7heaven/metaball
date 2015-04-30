@@ -14,16 +14,20 @@ public class MetaballManager {
 
     private static float gooieness = 2.0F;
     private static float threshold = 0.0006F;
-    private static float resolution = 10.0F;
-    private static int maxSteps = 400;
+    private static float resolution = 5.0F;
+    private static int maxSteps = 600;
 
     private List<Metaball> metaballs;
     private Path outline;
     private float minStrength;
 
+    private List<Path> outlines;
+
     private MetaballManager(){
         metaballs = new ArrayList<Metaball>();
         outline = new Path();
+
+        outlines = new ArrayList<Path>();
 
         minStrength = Metaball.MIN_STRENGTH;
     }
@@ -40,6 +44,10 @@ public class MetaballManager {
         return outline;
     }
 
+    public List<Path> getOutlines(){
+        return outlines;
+    }
+
     public void addMetaball(Metaball metaball){
         minStrength = Math.min(metaball.getStrength(), minStrength);
 
@@ -50,12 +58,15 @@ public class MetaballManager {
         metaballs.remove(metaball);
     }
 
+    public void removeAllMetaball(){ metaballs.clear();}
+
     public int getSize(){
         return metaballs.size();
     }
 
     public void freeze(){
         outline.reset();
+        outlines.clear();
 
         Vector2D seeker = new Vector2D(0, 0);
 //        Metaball metaball;
@@ -75,16 +86,20 @@ public class MetaballManager {
 
         seeker.copy(current.edge);
         outline.moveTo(seeker.x, seeker.y);
+        outlines.add(new Path());
+        outlines.get(outlines.size() - 1).moveTo(seeker.x, seeker.y);
 
         while(current != null && edgeSteps < maxSteps){
             rk2(seeker, resolution);
 
             outline.lineTo(seeker.x, seeker.y);
+            outlines.get(outlines.size() - 1).lineTo(seeker.x, seeker.y);
 
             for(Metaball metaball : metaballs){
                 if(seeker.dist(metaball.edge) < (resolution * 0.9F)){
                     seeker.copy(metaball.edge);
                     outline.lineTo(seeker.x, seeker.y);
+                    outlines.get(outlines.size() - 1).lineTo(seeker.x, seeker.y);
 
                     current.tracked = true;
 
@@ -94,6 +109,8 @@ public class MetaballManager {
                         if(current != null){
                             seeker.copy(current.edge);
                             outline.moveTo(seeker.x, seeker.y);
+                            outlines.add(new Path());
+                            outlines.get(outlines.size() - 1).moveTo(seeker.x, seeker.y);
                         }
                     }else{
                         current = metaball;
@@ -105,6 +122,8 @@ public class MetaballManager {
 
             ++edgeSteps;
         }
+
+        outline.close();
     }
 
     private Metaball untrackedMetaball(){
