@@ -50,9 +50,24 @@ public class MetaballView extends View {
         public void run(){
             for(int i = 0; i < as.size(); i++){
                 Metaball ball = subMetaball.get(i);
+                Point origin = originPositions.get(i);
                 PointF a = as.get(i);
                 if(!ball.attached){
-                    
+                    Vector2D v = ball.getPosition();
+
+                    a.x += (v.x - origin.x) * 0.3F;
+                    a.y += (v.y - origin.y) * 0.3F;
+
+                    v.x += a.x;
+                    v.y += a.y;
+
+                    ball.setPosition(v);
+
+                    a.x *= 0.81F;
+                    a.y *= 0.81F;
+
+                    invalidate();
+
                 }
 
             }
@@ -95,6 +110,8 @@ public class MetaballView extends View {
         paint.setColor(0xFF00CCFF);
 
         points = new ArrayList<PointF>();
+
+        handler.post(runnable);
 
     }
 
@@ -159,6 +176,28 @@ public class MetaballView extends View {
 
                     targetBall[i].setPosition(new Vector2D(p.x, p.y));
                 }
+
+                for(int i = 0; i < subMetaball.size(); i++){
+                    Metaball m = subMetaball.get(i);
+                    Vector2D v = m.getPosition();
+
+                    dx = event.getX() - v.x;
+                    dy = event.getY() - v.y;
+
+                    float d = dx * dx + dy * dy;
+
+                    if(d > 2500){
+                        m.attached = false;
+                    }else{
+                        m.attached = true;
+
+                        v.x = event.getX();
+                        v.y = event.getY();
+
+                        m.setPosition(v);
+                    }
+                }
+
                 metaballManager.freeze();
 
 //                points.clear();
