@@ -21,13 +21,9 @@ public class MetaballManager {
     private Path outline;
     private float minStrength;
 
-    private List<Path> outlines;
-
     private MetaballManager(){
         metaballs = new ArrayList<Metaball>();
         outline = new Path();
-
-        outlines = new ArrayList<Path>();
 
         minStrength = Metaball.MIN_STRENGTH;
     }
@@ -42,10 +38,6 @@ public class MetaballManager {
 
     public Path getOutline(){
         return outline;
-    }
-
-    public List<Path> getOutlines(){
-        return outlines;
     }
 
     public void addMetaball(Metaball metaball){
@@ -66,7 +58,6 @@ public class MetaballManager {
 
     public void freeze(){
         outline.reset();
-        outlines.clear();
 
         Vector2D seeker = new Vector2D(0, 0);
 //        Metaball metaball;
@@ -86,20 +77,16 @@ public class MetaballManager {
 
         seeker.copy(current.edge);
         outline.moveTo(seeker.x, seeker.y);
-        outlines.add(new Path());
-        outlines.get(outlines.size() - 1).moveTo(seeker.x, seeker.y);
 
         while(current != null && edgeSteps < maxSteps){
             rk2(seeker, resolution);
 
             outline.lineTo(seeker.x, seeker.y);
-            outlines.get(outlines.size() - 1).lineTo(seeker.x, seeker.y);
 
             for(Metaball metaball : metaballs){
                 if(seeker.dist(metaball.edge) < (resolution * 0.9F)){
                     seeker.copy(metaball.edge);
                     outline.lineTo(seeker.x, seeker.y);
-                    outlines.get(outlines.size() - 1).lineTo(seeker.x, seeker.y);
 
                     current.tracked = true;
 
@@ -109,8 +96,6 @@ public class MetaballManager {
                         if(current != null){
                             seeker.copy(current.edge);
                             outline.moveTo(seeker.x, seeker.y);
-                            outlines.add(new Path());
-                            outlines.get(outlines.size() - 1).moveTo(seeker.x, seeker.y);
                         }
                     }else{
                         current = metaball;

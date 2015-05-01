@@ -4,12 +4,10 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.PathMeasure;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.os.Handler;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -30,12 +28,6 @@ public class MetaballView extends View {
 
     private int centerX;
     private int centerY;
-
-    private int pathSlitCount = 50;
-    private List<Path> bouncingPath;
-    private PathMeasure pathMeasure;
-    private List<PointF> points;
-    private List<Path> outlines;
 
     private MetaballManager metaballManager;
 
@@ -91,9 +83,6 @@ public class MetaballView extends View {
         super(context, attrs, defStyle);
 
         metaballManager = MetaballManager.getInstance();
-//
-//        metaballManager.addMetaball(new Metaball(new Vector2D(500, 300), 4.0F));
-//        metaballManager.addMetaball(new Metaball(new Vector2D(100, 150), 4.0F));
 
         subMetaball = new ArrayList<Metaball>();
         as = new ArrayList<PointF>();
@@ -103,16 +92,10 @@ public class MetaballView extends View {
             targetBall[i] = new Metaball(new Vector2D(0, 0), 1.0F);
         }
 
-        bouncingPath = new ArrayList<Path>();
-        pathMeasure = new PathMeasure();
-
-
         paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(5);
         paint.setColor(0xFF00CCFF);
-
-        points = new ArrayList<PointF>();
 
         handler.post(runnable);
 
@@ -167,18 +150,8 @@ public class MetaballView extends View {
             case MotionEvent.ACTION_MOVE:
                 targetBall[0].setPosition(new Vector2D(event.getX(), event.getY()));
 
-                float dx = event.getX() - centerX;
-                float dy = event.getY() - centerY;
-
-                float degree = (float)  Math.atan2(dy, dx);
-
-                float distance = (float) Math.sqrt(dx * dx + dy * dy);
-
-//                for(int i = 1; i < targetBall.length; i++){
-//                    Point p = centerRadiusPoint(new Point(centerX, centerY), degree + (i * 0.8F), distance - (i * 30));
-//
-//                    targetBall[i].setPosition(new Vector2D(p.x, p.y));
-//                }
+                float dx;
+                float dy;
 
                 Metaball tBall = null;
                 float dis = Integer.MAX_VALUE;
@@ -208,18 +181,9 @@ public class MetaballView extends View {
                         ddis = dd;
                     }
 
-                    Log.d("d" + d, "ddd");
-
-//                    if(d > 100 && dd > 2500){
-//                        m.attached = false;
-//                    }else{
-//                        m.attached = true;
-//
-//                        v.x = event.getX();
-//                        v.y = event.getY();
-//
-//                        m.setPosition(v);
-//                    }
+                    if(dis > 100 && ddis > 2500){
+                        m.attached = false;
+                    }
                 }
 
                 if(tBall != null){
@@ -234,61 +198,14 @@ public class MetaballView extends View {
 
                 metaballManager.freeze();
 
-//                points.clear();
-//
-////                for(float i = 0; i <= length; i+= step){
-////                    pathMeasure.getPosTan(i, pos, tan);
-////
-////                    if(pPos[0] != -1){
-////                        bouncingPath.moveTo(pPos[0], pPos[1]);
-////                        bouncingPath.lineTo(pos[0], pos[1]);
-////                    }else{
-////                        bouncingPath.moveTo(pos[0], pos[1]);
-////                    }
-////
-////
-////                    pPos[0] = pos[0];
-////                    pPos[1] = pos[1];
-////
-////                    points.add(new PointF(pos[0], pos[1]));
-////
-////                }
-//
-//                outlines = metaballManager.getOutlines();
-//                bouncingPath.clear();
-//                for(Path p : outlines){
-//                    pathMeasure.setPath(p, false);
-//
-//                    float length = pathMeasure.getLength();
-//                    float step = length / pathSlitCount;
-//                    float[] pos = new float[2];
-//                    float[] tan = new float[2];
-//                    float[] pPos = new float[]{-1, -1};
-//
-//
-//                    bouncingPath.add(new Path());
-//                    for(float i = 0; i <= length; i+= step){
-//                        pathMeasure.getPosTan(i, pos, tan);
-////
-//                        if(pPos[0] != -1){
-//                            bouncingPath.get(bouncingPath.size() - 1).lineTo(pos[0], pos[1]);
-//                        }else{
-//                            bouncingPath.get(bouncingPath.size() - 1).moveTo(pos[0], pos[1]);
-//                        }
-//
-//
-//                        pPos[0] = pos[0];
-//                        pPos[1] = pos[1];
-//                    }
-//
-//                    bouncingPath.get(bouncingPath.size() - 1).close();
-//                }
-
                 invalidate();
 
                 break;
             case MotionEvent.ACTION_CANCEL:
             case MotionEvent.ACTION_UP:
+                for(Metaball m : subMetaball){
+                    m.attached = false;
+                }
                 break;
         }
 
@@ -304,12 +221,6 @@ public class MetaballView extends View {
         if(outline != null){
             canvas.drawPath(outline, paint);
         }
-
-//        if(bouncingPath != null){
-//            for(Path path : bouncingPath){
-//                canvas.drawPath(path, paint);
-//            }
-//        }
     }
 
 }
